@@ -1,0 +1,13 @@
+/build
+/target
+*~
+/.externalToolBuilders
+/*.iml
+/.idea
+/.settings
+/.project
+/.classpath
+/.DS_store
+
+release.properties
+pom.xml.releaseBackup
