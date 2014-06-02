@@ -1,0 +1,23 @@
+<component xmlns="http://adobe.com/idp/dsc/component/document">
+    <component-id>sftp-connector</component-id>
+    <version>1.0</version>
+    <bootstrap-class>com.github.harunhasdal.livecycle.sftp.BootstrapImpl</bootstrap-class>
+    <lifecycle-class>com.github.harunhasdal.livecycle.sftp.LifeCycleImpl</lifecycle-class>
+    <services>
+        <service name="SFTPConnector">
+            <implementation-class>com.github.harunhasdal.livecycle.sftp.SFTPConnectorImpl</implementation-class>
+            <small-icon>sftpicon.png</small-icon>
+            <large-icon>sftpicon.png</large-icon>
+            <auto-deploy service-id="SFTPConnector" minor-version="0" major-version="1" category-id="CustomUtilities"/>
+            <operations>
+                <operation name="writeDocument">
+                    <input-parameter type="com.adobe.idp.Document" title="Input Document" name="input"/>
+                    <input-parameter type="java.lang.String" title="Target Path" name="targetPath"/>
+                    <faults>
+                        <fault name="SFTPTransferException" type="com.github.harunhasdal.livecycle.sftp.SFTPTransferException" />
+                    </faults>
+                </operation>
+            </operations>
+        </service>
+    </services>
+</component>
