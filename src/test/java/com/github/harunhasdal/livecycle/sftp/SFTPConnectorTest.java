@@ -6,12 +6,17 @@ import com.adobe.idp.Document;
 import org.junit.Test;
 import org.junit.Before;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import com.jcraft.jsch.*;
+import org.mockito.Matchers;
+
+import static org.mockito.Mockito.*;
 
 public class SFTPConnectorTest {
 
-	SFTPConnector connector = new SFTPConnectorImpl();
+	SFTPConnectorImpl connector = new SFTPConnectorImpl();
 
 	String testTarget = "/var/www/test";
 	Document testDocument = new Document(new byte[]{'1'});
@@ -106,5 +111,27 @@ public class SFTPConnectorTest {
 		}
 	}
 
+	@Test
+	public void usesJschSession() throws Exception {
+		JSch jschMock = mock(JSch.class);
+		Session sessionMock = mock(Session.class);
+		ChannelSftp channelMock = mock(ChannelSftp.class);
+
+		when(jschMock.getSession("user1", "testhost", 22)).thenReturn(sessionMock);
+		when(sessionMock.openChannel("sftp")).thenReturn(channelMock);
+
+		connector.setJsch(jschMock);
+		connector.writeDocument(testDocument, testTarget, testParams);
+
+		verify(sessionMock).setConfig("StrictHostKeyChecking", "no");
+		verify(sessionMock).setPassword(testParams.get(SFTPConnector.PARAMETERS.PASSWORD));
+		verify(sessionMock).connect();
+		verify(sessionMock).openChannel("sftp");
+		verify(channelMock).connect();
+		verify(channelMock).cd(anyString());
+		verify(channelMock).put(Matchers.<InputStream>any(),anyString());
+		verify(channelMock).disconnect();
+		verify(sessionMock).disconnect();
+	}
 
 }

@@ -30,7 +30,7 @@ public interface SFTPConnector {
 
 	static interface PARAMETERS {
 		final String SFTP_HOST = "SFTP_HOST";
-		final String SFTP_PORT = "SFTP_HOST";
+		final String SFTP_PORT = "SFTP_PORT";
 		final String USERNAME = "USERNAME";
 		final String PASSWORD = "PASSWORD";
 	}

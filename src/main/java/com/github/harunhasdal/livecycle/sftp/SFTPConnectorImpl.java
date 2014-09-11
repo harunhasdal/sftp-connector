@@ -30,10 +30,11 @@ import java.util.Map;
 
 public class SFTPConnectorImpl implements SFTPConnector {
 	final AdobeLogger logger = AdobeLogger.getAdobeLogger(SFTPConnectorImpl.class.getName());
+	private JSch jsch = new JSch();
 
 	public void writeDocument(Document input, String target,Map<String, String> connectionParams) throws SFTPParameterException, SFTPTransferException {
 		validateParameters(input, target, connectionParams);
-		JSch jsch = new JSch();
+
 		Session session = null;
 		Channel channel = null;
 		ChannelSftp sftpChannel = null;
@@ -41,7 +42,7 @@ public class SFTPConnectorImpl implements SFTPConnector {
 		try {
 			session = jsch.getSession(connectionParams.get(PARAMETERS.USERNAME), connectionParams.get(PARAMETERS.SFTP_HOST), Integer.valueOf(connectionParams.get(PARAMETERS.SFTP_PORT)));
 			session.setConfig("StrictHostKeyChecking", "no");
-			session.setPassword(PARAMETERS.PASSWORD);
+			session.setPassword(connectionParams.get(PARAMETERS.PASSWORD));
 			session.connect();
 
 			channel = session.openChannel("sftp");
@@ -98,4 +99,7 @@ public class SFTPConnectorImpl implements SFTPConnector {
 		}
 	}
 
+	public void setJsch(JSch jSecureChannel){
+		this.jsch = jSecureChannel;
+	}
 }
