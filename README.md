@@ -40,6 +40,16 @@ Once you updated pom.xml with the correct version for livecycle sdk, you can bui
 
 `mvn package` or `mvn install`
 
+## Releasing a new version.
+
+You need to set the version using maven versions plugin as you see in the following example.
+
+`mvn versions:set -DnewVersion=1.1`
+
+You need to deploy to maven central by using the oss sonatype repository and relevant plugins using the following command.
+
+`mvn -DperformRelease=true -Dgpg.passphrase=****** clean deploy`
+
 ## License
 
 
