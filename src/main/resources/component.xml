@@ -13,8 +13,10 @@
                 <operation name="writeDocument">
                     <input-parameter type="com.adobe.idp.Document" title="Input Document" name="input"/>
                     <input-parameter type="java.lang.String" title="Target Path" name="targetPath"/>
+                    <input-parameter type="java.util.Map" title="Connection Parameters" name="connectionParams"/>
                     <faults>
                         <fault name="SFTPTransferException" type="com.github.harunhasdal.livecycle.sftp.SFTPTransferException" />
+                        <fault name="SFTPParameterException" type="com.github.harunhasdal.livecycle.sftp.SFTPParameterException" />
                     </faults>
                 </operation>
             </operations>

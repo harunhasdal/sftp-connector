@@ -24,6 +24,16 @@ package com.github.harunhasdal.livecycle.sftp;
 
 import com.adobe.idp.Document;
 
+import java.util.Map;
+
 public interface SFTPConnector {
-	void writeDocument(Document input, String target) throws SFTPTransferException;
+
+	static interface PARAMETERS {
+		final String SFTP_HOST = "SFTP_HOST";
+		final String SFTP_PORT = "SFTP_HOST";
+		final String USERNAME = "USERNAME";
+		final String PASSWORD = "PASSWORD";
+	}
+
+	void writeDocument(Document input, String target, Map<String,String> connectionParams) throws SFTPParameterException, SFTPTransferException;
 }

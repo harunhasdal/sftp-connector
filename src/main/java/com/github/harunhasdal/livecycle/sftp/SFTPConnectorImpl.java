@@ -26,23 +26,22 @@ import com.adobe.idp.Document;
 import com.adobe.logging.AdobeLogger;
 import com.jcraft.jsch.*;
 
+import java.util.Map;
+
 public class SFTPConnectorImpl implements SFTPConnector {
 	final AdobeLogger logger = AdobeLogger.getAdobeLogger(SFTPConnectorImpl.class.getName());
 
-	String SFTPHOST = "localhost";
-	int SFTPPORT = 22;
-	String SFTPUSER = "username";
-	String SFTPPASS = "password";
-
-	public void writeDocument(Document input, String target) {
+	public void writeDocument(Document input, String target,Map<String, String> connectionParams) throws SFTPParameterException, SFTPTransferException {
+		validateParameters(input, target, connectionParams);
 		JSch jsch = new JSch();
 		Session session = null;
 		Channel channel = null;
 		ChannelSftp sftpChannel = null;
+
 		try {
-			session = jsch.getSession(SFTPUSER, SFTPHOST, SFTPPORT);
+			session = jsch.getSession(connectionParams.get(PARAMETERS.USERNAME), connectionParams.get(PARAMETERS.SFTP_HOST), Integer.valueOf(connectionParams.get(PARAMETERS.SFTP_PORT)));
 			session.setConfig("StrictHostKeyChecking", "no");
-			session.setPassword(SFTPPASS);
+			session.setPassword(PARAMETERS.PASSWORD);
 			session.connect();
 
 			channel = session.openChannel("sftp");
@@ -52,19 +51,51 @@ public class SFTPConnectorImpl implements SFTPConnector {
 			sftpChannel.cd(target);
 			sftpChannel.put(input.getInputStream(), (String)input.getAttribute("wsfilename"));
 
-			sftpChannel.exit();
-			session.disconnect();
 		} catch (JSchException e) {
 			throw new SFTPTransferException(e);
 		} catch (SftpException e) {
 			throw new SFTPTransferException(e);
 		} finally{
-			sftpChannel.exit();
-			logger.fine("sftp Channel exited.");
-			channel.disconnect();
-			logger.fine("Channel disconnected.");
-			session.disconnect();
-			logger.fine("Host Session disconnected.");
+			if(sftpChannel != null){
+				sftpChannel.exit();
+				logger.fine("SFTP Channel exited.");
+				channel.disconnect();
+				logger.fine("SFTP Channel disconnected.");
+			}
+			if(session != null){
+				session.disconnect();
+				logger.fine("SFTP Session disconnected.");
+			}
 		}
 	}
+
+	private void validateParameters(Document input, String target, Map<String, String> connectionParams) {
+		if(input == null){
+			throw new SFTPParameterException("Input is required");
+		}
+		if(target == null){
+			throw new SFTPParameterException("Target path is required");
+		}
+		if(connectionParams == null){
+			throw new SFTPParameterException("Connection parameter map is required");
+		}
+		if(!connectionParams.containsKey(PARAMETERS.SFTP_HOST)){
+			throw new SFTPParameterException(PARAMETERS.SFTP_HOST + " parameter is required.");
+		}
+		if(!connectionParams.containsKey(PARAMETERS.SFTP_PORT)){
+			throw new SFTPParameterException(PARAMETERS.SFTP_PORT + " parameter is required.");
+		}
+		if(!connectionParams.containsKey(PARAMETERS.USERNAME)){
+			throw new SFTPParameterException(PARAMETERS.USERNAME + " parameter is required.");
+		}
+		if(!connectionParams.containsKey(PARAMETERS.PASSWORD)){
+			throw new SFTPParameterException(PARAMETERS.PASSWORD + " parameter is required.");
+		}
+		try{
+			Integer.parseInt(connectionParams.get(PARAMETERS.SFTP_PORT));
+		} catch (NumberFormatException e){
+			throw new SFTPParameterException(PARAMETERS.SFTP_PORT + " should be a valid port number", e);
+		}
+	}
+
 }
