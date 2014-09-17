@@ -1,6 +1,6 @@
 # sftp-connector
 
-Adobe LiveCycle custom component for SFTP utilities. 
+An Opensource Adobe LiveCycle custom component for SFTP utilities. 
 
 This component is developed using [JSch](http://www.jcraft.com/jsch/) library. 
 
